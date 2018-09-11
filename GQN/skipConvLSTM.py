@@ -2,7 +2,64 @@ from keras import backend as K
 from keras.engine.topology import Layer
 import numpy as np
 
-def GeneratorCell(Layer):
+# Implement as a multilayer object instead of a layer itself
+def GeneratorCell0(self, h0, v, r, z, c0, u0):
+    # 1) concatenate h0, v, r, z
+    input = keras.layers.Input(shape=()) # TODO: what is shape of input???
+
+    # (2a) sig0 aka forget gate
+    forget = keras.layers.Conv2D(
+                    filters = ?,
+                    kernel_size=(5,5),
+                    strides=(1,1),
+                    activation='sigmoid'
+            )(input)
+
+    # (2b) sig1 aka input gate
+    inp_gate = keras.layers.Conv2D(
+                filters = ?,
+                kernel_size=(5,5),
+                strides=(1,1),
+                activation='sigmoid'
+            )(input)
+
+    # (2c) tanh aka canditates
+    candiates = keras.layers.Conv2D(
+                filters = ?,
+                kernel_size=(5,5),
+                strides=(1,1),
+                activation='tanh'
+            )(input)
+
+    # (2d) sig2 aka output
+    output = keras.layers.Conv2D(
+                filters = ?,
+                kernel_size=(5,5),
+                strides=(1,1),
+                activation='sigmoid'
+            )(input)
+
+    # (3) update context/state
+    c = c0 * forget + inp_gate * candidates
+
+    # (4) update output/h
+    h = tanh(context) + output
+
+    # (5) u = u0 + delta?(h) (kernel 4x4, stride 4x4)
+    delta = keras.layers.Conv2D(
+                filters = ?,
+                kernel_size=(4,4),
+                strides=(4,4)
+            )(output)# delta?, and no activation???
+
+    u = u0 + delta
+
+    # return outputs for the next unit
+    return h, c, u
+
+
+
+def GeneratorCellLayer(Layer):
     def __init__(self, output_dim, **kwargs):
         self.output_dim = output_dim                    # specify output dimensions
         super(GeneratorCell, self).__init__(**kwargs)   # init with kwargs
