@@ -25,7 +25,6 @@ def Encoder():
                 activation='relu'
             )(input_vis)
 
-
     # conv2 kernel 3x3, stride 1x1
     #  ===> 32x32x128
     # 128 filters, but shouldn't the W and H be 30?  Why isn't padding stated??  Should I just assume padding?
@@ -58,30 +57,29 @@ def Encoder():
 
     # conc kernel 1x1, stride 1x1
     # ---> 16x16x128 (same as before)
-    conv5 = keras.layers.Conv2D(filters = 256, kernel_size = (3,3), strides = (1,1), activation='relu')(conv4r)
+    conv5 = keras.layers.Conv2D(filters = 256, kernel_size = (3,3), strides = (1,1), activation='relu', padding='same')(conv4r)
 
     # THE RESULT OF THIS LAYER IS THE STATE REPRESENTATION
     r = keras.layers.Conv2D(filters = 256, kernel_size = (1,1), strides=(1,1), activation='relu')(conv5)
-
     # Define the model
     model = keras.Model(inputs=[input_vis, input_pos], outputs=r)
     return model
 
 # check if model outputs
 # inV = np.zeros((1,64,64,3))
-inP = np.zeros((1,1,1,7))
-
-root_path = '../../Datasets'
-data_reader = DataReader(dataset='jaco', context_size=5, root=root_path)
-data = data_reader.read(batch_size=12)
-
-model = Encoder()
+# inP = np.zeros((1,1,1,7))
+#
+# root_path = '../../Datasets'
+# data_reader = DataReader(dataset='jaco', context_size=5, root=root_path)
+# data = data_reader.read(batch_size=12)
+#
+# model = Encoder()
 # model.compile(optimizer='rmsprop',
 #               loss='categorical_crossentropy',
 #               metrics=['accuracy'])
 # model.fit([data.query.context.frames, data.query.context.cameras])  # starts training
-sess = tf.Session()
-K.set_session(sess)
-with sess.as_default():
-    print(model.predict([data.query.context.frames[0].eval(session=sess), data.query.context.cameras[0].eval(session=sess)], verbose=1))
-keras.utils.plot_model(model, to_file='representation_net.png')
+# sess = tf.Session()
+# K.set_session(sess)
+# with sess.as_default():
+#     print(model.predict([data.query.context.frames[0].eval(session=sess), data.query.context.cameras[0].eval(session=sess)], verbose=1))
+# keras.utils.plot_model(model, to_file='representation_net.png')

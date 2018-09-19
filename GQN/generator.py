@@ -9,14 +9,18 @@ def Generator():
     r = keras.layers.Input(shape=(16,16,256), name="r")
 
     # INIT CONVLSTM CELL VALUES
-    h0 = keras.layers.Input(tensor=tf.constant(np.zeros((1,16,16,256)), dtype='float32'), name="h0") # p26 of paper indicates this is initialized as 0
-    c0 = keras.layers.Input(tensor=tf.constant(np.zeros((1,16,16,256)), dtype='float32'), name="c0")
-    u0 = keras.layers.Input(tensor=tf.constant(np.zeros((1,64,64,256)), dtype='float32'), name="u0")
+    # h0 = keras.layers.Input(tensor=tf.constant(np.zeros((1,16,16,256)), dtype='float32'), name="h0") # p26 of paper indicates this is initialized as 0
+    # c0 = keras.layers.Input(tensor=tf.constant(np.zeros((1,16,16,256)), dtype='float32'), name="c0")
+    # u0 = keras.layers.Input(tensor=tf.constant(np.zeros((1,64,64,256)), dtype='float32'), name="u0")
+
+    h0 = keras.layers.Input(shape=(16,16,256), name="h0")
+    c0 = keras.layers.Input(shape=(16,16,256), name="c0")
+    u0 = keras.layers.Input(shape=(64,64,256), name="u0")
 
     # TODO: How many cells in paper????
     # TODO: LOOP?
-    cell0 = GeneratorCell()([vq, r, h0, c0, u0])
-    cell1 = GeneratorCell()(inputs=[vq,r]+cell0)
+    cell0 = GeneratorCell()(inputs=[vq, r, h0, c0, u0])
+    cell1 = GeneratorCell()(inputs=[vq, r] + cell0)
     cell2 = GeneratorCell()(inputs=[vq, r] + cell1)
 
     # last conv on u (kernel 1x1, stride 1x1)
@@ -109,7 +113,7 @@ def GeneratorCell():
     return keras.Model(inputs=[vq, r, h0, c0, u0], outputs=[h, c, u])
 
 
-inp = np.zeros((1,16,16,256))
-model = Generator()
-keras.utils.plot_model(model, to_file='generator_net.png')
-print(model.predict([inp, inp], verbose=1))
+# inp = np.zeros((1,16,16,256))
+# model = Generator()
+# keras.utils.plot_model(model, to_file='generator_net.png')
+# print(model.predict([inp, inp], verbose=1))
