@@ -2,7 +2,7 @@ import keras
 import numpy as np
 import tensorflow as tf
 from keras import backend as K
-from data_reader import DataReader
+# from data_reader import DataReader
 
 """
 Implementation of tower network from

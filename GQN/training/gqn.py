@@ -1,13 +1,13 @@
 #
 #  Full end-to-end GQN model w/ encoder and decoder
 #
-import keras
 import numpy as np
 import tensorflow as tf
+import keras
 from keras import backend as K
-from data_reader import DataReader
-from encoder import Encoder
-from generator import Generator
+from training.data_reader import DataReader
+from training.encoder import Encoder
+from training.generator import Generator
 from PIL import Image
 
 class GQN:
@@ -28,12 +28,12 @@ class GQN:
         self.decoders = [tuner]
 
 
-context = np.zeros((1,64,64,3))
-camera = np.zeros((1,1,1,7))
-q = np.zeros((1,16,16,256))
-gqn = GQN()
-keras.utils.plot_model(gqn.model, to_file='gqn.png')
-img = gqn.model.predict([context, camera, q], verbose=1)
-img = img[0]
-img = Image.fromarray(img, 'RGB')
-img.show()
+# context = np.zeros((1,64,64,3))
+# camera = np.zeros((1,1,1,7))
+# q = np.zeros((1,16,16,256))
+# gqn = GQN()
+# # keras.utils.plot_model(gqn.model, to_file='gqn.png')
+# img = gqn.model.predict([context, camera, q], verbose=1)
+# img = img[0]
+# img = Image.fromarray(img, 'RGB')
+# img.show()
