@@ -1,11 +1,11 @@
 export JOB_NAME="job12"
 
-gcloud ml-engine jobs submit training run28 \
+gcloud ml-engine jobs submit training run46 \
   --job-dir gs://gqnmodel/  \
   --runtime-version 1.8 \
   --module-name training/cloud_train \
   --package-path training \
-  --region $REGION
+  --region us-central1
 
 
   # -- \

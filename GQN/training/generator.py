@@ -7,30 +7,24 @@ def Generator():
     # INPUTS
     vq = keras.layers.Input(shape=(16,16,256), name="vq")
     r = keras.layers.Input(shape=(16,16,256), name="r")
-
-    # INIT CONVLSTM CELL VALUES
-    # h0 = keras.layers.Input(tensor=tf.constant(np.zeros((1,16,16,256)), dtype='float32'), name="h0") # p26 of paper indicates this is initialized as 0
-    # c0 = keras.layers.Input(tensor=tf.constant(np.zeros((1,16,16,256)), dtype='float32'), name="c0")
-    # u0 = keras.layers.Input(tensor=tf.constant(np.zeros((1,64,64,256)), dtype='float32'), name="u0")
-
     h0 = keras.layers.Input(shape=(16,16,256), name="h0")
     c0 = keras.layers.Input(shape=(16,16,256), name="c0")
     u0 = keras.layers.Input(shape=(64,64,256), name="u0")
 
     # TODO: How many cells in paper????
-    # TODO: LOOP?
+    # NONDIFFERENTIABLE WHEN USING DIFFERENTIABLE MODEL?
     cell0 = GeneratorCell()(inputs=[vq, r, h0, c0, u0])
-    cell1 = GeneratorCell()(inputs=[vq, r] + cell0)
-    cell2 = GeneratorCell()(inputs=[vq, r] + cell1)
+    # cell1 = GeneratorCell()(inputs=[vq, r] + cell0)
+    # cell2 = GeneratorCell()(inputs=[vq, r] + cell1)
 
     # last conv on u (kernel 1x1, stride 1x1)
     # WHAT IS THIS OUTPUT ?
     something = keras.layers.Conv2D(
-                            filters = 256, # ???
+                            filters = 3, # ???
                             kernel_size = (1,1),
                             strides = (1,1)
                             # activation?
-                        )(cell2[2])
+                        )(cell0[2])
 
     model = keras.Model(inputs=[vq, r, h0, c0, u0], outputs=something)
     return model
@@ -103,7 +97,7 @@ def GeneratorCell():
 
     # (5) u = u0 + delta?(h) (kernel 4x4, stride 4x4)
     delta = keras.layers.Conv2DTranspose( # TODO: should be transpose
-                filters = 256,
+                filters = 256, # 3 or 256
                 kernel_size=(4,4),
                 strides=(4,4)
             )(output) # what is delta symbol?, and no ACTIVATION???
