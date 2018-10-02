@@ -14,8 +14,8 @@ def Generator():
     # TODO: How many cells in paper????
     # NONDIFFERENTIABLE WHEN USING DIFFERENTIABLE MODEL?
     cell0 = GeneratorCell()(inputs=[vq, r, h0, c0, u0])
-    # cell1 = GeneratorCell()(inputs=[vq, r] + cell0)
-    # cell2 = GeneratorCell()(inputs=[vq, r] + cell1)
+    cell1 = GeneratorCell()(inputs=[vq, r] + cell0)
+    cell2 = GeneratorCell(final=True)(inputs=[vq, r] + cell1)
 
     # last conv on u (kernel 1x1, stride 1x1)
     # WHAT IS THIS OUTPUT ?
@@ -24,7 +24,7 @@ def Generator():
                             kernel_size = (1,1),
                             strides = (1,1)
                             # activation?
-                        )(cell0[2])
+                        )(cell2)
 
     model = keras.Model(inputs=[vq, r, h0, c0, u0], outputs=something)
     return model
@@ -33,7 +33,7 @@ def Generator():
 
 # Individual ConvLSTM cell as described on p38 of paper
 # NOTE: I include the conv of h into z in the cell instead of passing conv'd input
-def GeneratorCell():
+def GeneratorCell(final=False):
     # Cell Inputs
     vq = keras.layers.Input(shape=(16,16,256), name="vq")
     r = keras.layers.Input(shape=(16,16,256), name="r")
@@ -104,7 +104,10 @@ def GeneratorCell():
 
     u = keras.layers.add([u0, delta])
 
-    return keras.Model(inputs=[vq, r, h0, c0, u0], outputs=[h, c, u])
+    if final: output = u
+    else: output = [h, c, u]
+
+    return keras.Model(inputs=[vq, r, h0, c0, u0], outputs=output)
 
 
 # inp = np.zeros((1,16,16,256))
