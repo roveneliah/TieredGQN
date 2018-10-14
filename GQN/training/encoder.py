@@ -60,9 +60,10 @@ def Encoder():
     conv5 = keras.layers.Conv2D(filters = 256, kernel_size = (3,3), strides = (1,1), activation='relu', padding='same')(conv4r)
 
     # THE RESULT OF THIS LAYER IS THE STATE REPRESENTATION
-    r = keras.layers.Conv2D(filters = 256, kernel_size = (1,1), strides=(1,1), activation='relu')(conv5)
+    dr = keras.layers.Conv2D(filters = 256, kernel_size = (1,1), strides=(1,1), activation='relu')(conv5)
+
     # Define the model
-    model = keras.Model(inputs=[frames, cameras], outputs=r)
+    model = keras.Model(inputs=[frames, cameras], outputs=dr)
     return model
 
 # check if model outputs
