@@ -14,10 +14,9 @@ from generator import Generator
 from PIL import Image
 
 class GQN:
-    # If using numpy arrays, set tfrecords to false
-    def __init__(self, samples):
-        frames = keras.layers.Input(shape=(samples,64,64,3), name="frames")
-        cameras = keras.layers.Input(shape=(samples,1,1,7), name="cameras")
+    def __init__(self, samples): # use samples in dynamic definition
+        frames = keras.layers.Input(shape=(64,64,3), name="frames")
+        cameras = keras.layers.Input(shape=(1,1,7), name="cameras")
         q = keras.layers.Input(shape=(16,16,256), name="query")
 
         # INITIAL CONVLSTM CELL VALS
@@ -25,20 +24,7 @@ class GQN:
         c00 = keras.layers.Input(tensor=tf.constant(np.zeros((1,16,16,256)), dtype='float32'), name="c00")
         u00 = keras.layers.Input(tensor=tf.constant(np.zeros((1,64,64,256)), dtype='float32'), name="u00")
 
-        # TODO: HOW TO GET THE INDIVIDUAL FRAMES
-        encoders = []
-        for i in range(samples):
-            frame = keras.layers.Lambda(lambda x: x[i,i])(frames)
-            print(frame)
-            camera = keras.layers.Lambda(lambda x: x[i,i])(cameras)
-            print(camera)
-            encoder = Encoder()(inputs=[frame, camera)
-            encoders.append(encoder)
-
-        print(encoders)
-        r = keras.layers.add(encoders)
-        print(r)
-
+        r = Encoder()(inputs=[frames, cameras])
         target = Generator()(inputs=[q, r, h00, c00, u00])
         self.model = keras.Model(inputs=[frames, cameras, q, h00, c00, u00], outputs=target)
         # self.encoder = keras.Model(inputs=[r0, frame, camera, q, h00, c00, u00], outputs=r)
