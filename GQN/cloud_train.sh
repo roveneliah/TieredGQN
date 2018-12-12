@@ -1,12 +1,12 @@
 # export CLOUD_CONFIG = training/cloudml-gpu.yaml
 
-gcloud ml-engine jobs submit training run60 \
+gcloud ml-engine jobs submit training run61 \
   --job-dir gs://gqnmodel/  \
   --runtime-version 1.8 \
-  --module-name training/cloud_train \
-  --package-path training \
+  --module-name cloud_train \
+  --package-path model \
   --region us-central1 \
-  --config=training/cloudml-gpu.yaml
+  --config=cloudml-gpu.yaml
 
 
   # -- \

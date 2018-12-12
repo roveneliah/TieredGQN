@@ -2,6 +2,7 @@ import argparse
 import keras
 from data_reader import DataReader
 from gqn import GQN
+import numpy as np
 # import utils
 
 # Path for saving logs
@@ -12,9 +13,10 @@ logs_path =  './logs/tensorboard'
 root_path = 'gs://gqn-dataset/'
 root_path = '~/Downloads'
 data_reader = DataReader(dataset='rooms_free_camera_no_object_rotations', context_size=5, root=root_path)
-# test_reader = DataReader(dataset='rooms_free_camera_no_object_rotations', context_size=5, root=root_path, mode="test")
-data = data_reader.read(batch_size=5)
-# test_data = test_reader.read(batch_size=10)
+test_reader = DataReader(dataset='rooms_free_camera_no_object_rotations', context_size=5, root=root_path, mode="test")
+batch_size = 10
+data = data_reader.read(batch_size=batch_size)
+test_data = test_reader.read(batch_size=batch_size)
 
 # convert to numpy arrays
 frames = data.query.context.frames
@@ -23,23 +25,22 @@ query = data.query.query_camera
 target = data.target
 
 # testing data
-# test_frames = test_data.query.context.frames
-# test_cameras = test_data.query.context.cameras
-# test_query = test_data.query.query_camera
-# test_target = test_data.target
+test_frames = test_data.query.context.frames
+test_cameras = test_data.query.context.cameras
+test_query = test_data.query.query_camera
+test_target = test_data.target
 
 # https://www.youtube.com/watch?v=VxnHf-FfWKY
 
-# preprocess data as needed (??)
+print(frames)
+
 # initialize model
-model = GQN(5).model
-# TODO: compilation params
-model.compile(optimizer = "Adam" , loss = "binary_crossentropy", metrics = ["accuracy"])
+model = GQN(batch_size).model
+model.compile(optimizer = "Adam" , loss = "binary_crossentropy", metrics = ["accuracy"]) # TODO: compilation params
 tensorboard = keras.callbacks.TensorBoard(log_dir=logs_path, histogram_freq=0, write_graph=True, write_images=True)
 epoch_callback = keras.callbacks.LambdaCallback(on_epoch_end=lambda epoch, logs: saveModelToCloud(epoch, 3))
 filepath="weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
 checkpoint = keras.callbacks.ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
-
 
 model.fit(
     x = [frames, cameras, query],
@@ -49,8 +50,8 @@ model.fit(
     # batch_size=None,
     callbacks=[tensorboard, epoch_callback, checkpoint],
     steps_per_epoch=2,
-    # validation_data=([test_frames, test_cameras, test_query], test_target),
-    # validation_steps=1
+    validation_data=([test_frames, test_cameras, test_query], test_target),
+    validation_steps=1
 )
 print("done training")
 

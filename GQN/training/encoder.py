@@ -10,7 +10,7 @@ Implementation of tower network from
 """
 def Encoder():
     # input 1: 64x64x3
-    frames = keras.layers.Input(shape=(64,64,3), name="frames")
+    frame = keras.layers.Input(shape=(64,64,3), name="frame")
 
     # conv1 kernel 2x2, stride 2x2
     # ==> 32x32x256
@@ -23,7 +23,7 @@ def Encoder():
                 strides=(2, 2),
                 padding='valid',
                 activation='relu'
-            )(frames)
+            )(frame)
 
     # conv2 kernel 3x3, stride 1x1
     #  ===> 32x32x128
@@ -39,9 +39,9 @@ def Encoder():
     conv3 = keras.layers.Conv2D(filters = 256, kernel_size = (2,2), strides = (2,2), activation='relu', padding='same')(conv2)
 
     # input 2: 1x1x7
-    cameras = keras.layers.Input(shape=(1,1,7), name="camera")
+    camera = keras.layers.Input(shape=(1,1,7), name="camera")
     # reshape input to 16x16x7
-    b1 = keras.layers.Lambda(lambda x: K.repeat_elements(x, 16, 1))(cameras)
+    b1 = keras.layers.Lambda(lambda x: K.repeat_elements(x, 16, 1))(camera)
     b2 = keras.layers.Lambda(lambda x: K.repeat_elements(x, 16, 2))(b1)
 
     # concatenate b2 onto conv3
@@ -63,7 +63,7 @@ def Encoder():
     dr = keras.layers.Conv2D(filters = 256, kernel_size = (1,1), strides=(1,1), activation='relu')(conv5)
 
     # Define the model
-    model = keras.Model(inputs=[frames, cameras], outputs=dr)
+    model = keras.Model(inputs=[frame, camera], outputs=dr)
     return model
 
 # check if model outputs
